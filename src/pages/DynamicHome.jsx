@@ -3,7 +3,8 @@ import { BellRing, MessageCircle, Settings as SettingsIcon, Bookmark, Languages,
 import MascotRenderer from '../components/MascotRenderer';
 import RadarCard from '../components/RadarCard';
 import { useAppContext } from '../context/AppContext';
-import { buildRadarLearners } from '../constants/radarData';
+import { buildRadarLearners, getRadarFriendByThreadId } from '../constants/radarData';
+import { LANGUAGES } from '../constants/languages';
 
 export default function DynamicHome({ onNavigate, lang }) {
   const { uiStrings, nativeLang, chatThreads, openChatThread, userProfile } = useAppContext();
@@ -15,6 +16,14 @@ export default function DynamicHome({ onNavigate, lang }) {
     const unreadThreads = chatThreads.filter(t => t.unread > 0);
     // If there are no unread messages, maybe show the latest one just to have something
     return unreadThreads.length > 0 ? unreadThreads : chatThreads.slice(0, 1);
+  }, [chatThreads]);
+
+  const threadFriendMeta = useMemo(() => {
+    return Object.fromEntries(
+      chatThreads
+        .filter((thread) => thread.type === 'friend')
+        .map((thread) => [thread.id, getRadarFriendByThreadId(thread.id)])
+    );
   }, [chatThreads]);
 
   const openAlertThread = (thread) => {
@@ -100,36 +109,48 @@ export default function DynamicHome({ onNavigate, lang }) {
         </div>
 
         <div className="space-y-4">
-          {inboxAlerts.map((thread) => (
-            <div
-              key={thread.id}
-              onClick={() => openAlertThread(thread)}
-              className="bg-[#2A2A3B] border-4 border-black shadow-[4px_4px_0_#000] rounded-[1.5rem] p-4 flex items-center gap-4 cursor-pointer hover:bg-[#323246] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
-            >
-              {thread.type === 'ai' ? (
-                <div className="w-14 h-14 flex-none rounded-2xl flex items-center justify-center border-4 border-black" style={{ backgroundColor: lang.secondaryColor }}>
-                  <MascotRenderer languageId={lang.id} mood="happy" className="w-10 h-10" animated={false} />
-                </div>
-              ) : (
-                <div className="w-14 h-14 flex-none bg-white rounded-2xl flex items-center justify-center border-4 border-black overflow-hidden p-0.5">
-                  <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${thread.name}`} alt={thread.name} className="w-full h-full object-cover rounded-xl bg-[#00FF87]" />
-                </div>
-              )}
+          {inboxAlerts.map((thread) => {
+            const friendMeta = threadFriendMeta[thread.id];
+            const learningLang = friendMeta ? LANGUAGES[friendMeta.learningLangId] : null;
+            const nativeFriendLang = friendMeta ? LANGUAGES[friendMeta.nativeLangId] : null;
 
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-center mb-1 gap-2">
-                  <h3 className="text-white font-black text-base truncate flex items-center gap-1">
-                    {thread.name}
-                    {thread.type === 'ai' && <span className="bg-black text-white text-[8px] px-1 rounded uppercase border border-white">AI</span>}
-                  </h3>
-                  {thread.unread > 0 && (
-                    <span className="bg-[#FF426A] text-white text-[10px] font-black px-2 py-1 rounded-md border-2 border-black uppercase">Unread {thread.unread}</span>
-                  )}
+            return (
+              <div
+                key={thread.id}
+                onClick={() => openAlertThread(thread)}
+                className="bg-[#2A2A3B] border-4 border-black shadow-[4px_4px_0_#000] rounded-[1.5rem] p-4 flex items-center gap-4 cursor-pointer hover:bg-[#323246] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+              >
+                {thread.type === 'ai' ? (
+                  <div className="w-14 h-14 flex-none rounded-2xl flex items-center justify-center border-4 border-black" style={{ backgroundColor: lang.secondaryColor }}>
+                    <MascotRenderer languageId={lang.id} mood="happy" className="w-10 h-10" animated={false} />
+                  </div>
+                ) : (
+                  <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${thread.name}`} alt={thread.name} className="w-14 h-14 flex-none rounded-xl border-4 border-black bg-[#E5E7EB]" />
+                )}
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center mb-1 gap-2">
+                    <h3 className="text-white font-black text-base truncate flex items-center gap-1.5">
+                      {thread.name}
+                      {thread.type === 'ai' && <span className="bg-black text-white text-[8px] px-1 rounded uppercase border border-white">AI</span>}
+                      {thread.type === 'friend' && friendMeta && (
+                        <span className="inline-flex items-center gap-1">
+                          <span className="w-4 h-4 rounded-full border border-white/70 overflow-hidden bg-white">
+                            <MascotRenderer languageId={learningLang?.id || lang.id} mood="happy" animated={false} className="w-full h-full" />
+                          </span>
+                          <span className="text-[11px] leading-none">{nativeFriendLang?.flag || '🏳️'}</span>
+                        </span>
+                      )}
+                    </h3>
+                    {thread.unread > 0 && (
+                      <span className="bg-[#FF426A] text-white text-[10px] font-black px-2 py-1 rounded-md border-2 border-black uppercase">Unread {thread.unread}</span>
+                    )}
+                  </div>
+                  <p className="text-[#A1A1AA] font-bold text-xs truncate">{thread.preview}</p>
                 </div>
-                <p className="text-[#A1A1AA] font-bold text-xs truncate">{thread.preview}</p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

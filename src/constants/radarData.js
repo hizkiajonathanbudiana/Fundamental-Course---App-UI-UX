@@ -49,3 +49,8 @@ export const buildRadarLearners = (activeLearningLangId) => {
     };
   });
 };
+
+export const getRadarFriendByThreadId = (threadId) => {
+  if (!threadId) return null;
+  return BASE_RADAR_LEARNERS.find((friend) => friend.threadId === threadId) || null;
+};

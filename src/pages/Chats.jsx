@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Bot, MessageCircle, Search, UserPlus } from 'lucide-react';
 import MascotRenderer from '../components/MascotRenderer';
 import { useAppContext } from '../context/AppContext';
+import { LANGUAGES } from '../constants/languages';
+import { getRadarFriendByThreadId } from '../constants/radarData';
 
 const FILTERS = [
   { id: 'all', label: 'All' },
@@ -16,6 +18,14 @@ export default function Chats({ onNavigate, lang }) {
   const [activeFilter, setActiveFilter] = useState('all');
 
   const unreadCount = chatThreads.reduce((sum, thread) => sum + (thread.unread || 0), 0);
+
+  const threadFriendMeta = useMemo(() => {
+    return Object.fromEntries(
+      chatThreads
+        .filter((thread) => thread.type === 'friend')
+        .map((thread) => [thread.id, getRadarFriendByThreadId(thread.id)])
+    );
+  }, [chatThreads]);
 
   const visibleThreads = useMemo(() => {
     const normalizedQuery = query.toLowerCase().trim();
@@ -99,6 +109,12 @@ export default function Chats({ onNavigate, lang }) {
             onClick={() => openThread(thread)}
             className="w-full text-left bg-white border-4 border-black rounded-2xl p-3 shadow-[4px_4px_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
           >
+            {(() => {
+              const friendMeta = threadFriendMeta[thread.id];
+              const learningLang = friendMeta ? LANGUAGES[friendMeta.learningLangId] : null;
+              const nativeLang = friendMeta ? LANGUAGES[friendMeta.nativeLangId] : null;
+
+              return (
             <div className="flex items-center gap-3">
               {thread.type === 'ai' ? (
                 <div className="w-12 h-12 rounded-xl border-4 border-black overflow-hidden" style={{ backgroundColor: lang.primaryColor }}>
@@ -114,9 +130,17 @@ export default function Chats({ onNavigate, lang }) {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-black font-black text-base truncate flex items-center gap-1">
+                  <p className="text-black font-black text-base truncate flex items-center gap-1.5">
                     {thread.name}
                     {thread.type === 'ai' && <Bot size={12} strokeWidth={3} className="text-[#6B7280]" />}
+                    {thread.type === 'friend' && friendMeta && (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="w-4 h-4 rounded-full border border-black overflow-hidden bg-white">
+                          <MascotRenderer languageId={learningLang?.id || lang.id} mood="happy" animated={false} className="w-full h-full" />
+                        </span>
+                        <span className="text-[11px] leading-none">{nativeLang?.flag || '🏳️'}</span>
+                      </span>
+                    )}
                   </p>
                   <span className="text-[11px] font-black text-[#4B5563]">{thread.time}</span>
                 </div>
@@ -132,6 +156,8 @@ export default function Chats({ onNavigate, lang }) {
                 )}
               </div>
             </div>
+              );
+            })()}
           </button>
         ))}
       </div>
