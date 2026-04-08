@@ -9,7 +9,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'ai-momo',
     type: 'ai',
     name: 'Momo (AI)',
-    preview: '準備好今天的口說練習了嗎？',
+    preview: '嗨！我是Momo。你現在的程度是什麼呢？',
     time: '4:51 PM',
     unread: 1
   },
@@ -17,7 +17,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'chen-wei',
     type: 'friend',
     name: 'Chen Wei',
-    preview: '今晚要不要一起練習聲調？',
+    preview: '我可以幫你練習聲調，你現在方便嗎？',
     time: '4:48 PM',
     unread: 2
   },
@@ -25,7 +25,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'sarah-k',
     type: 'friend',
     name: 'Sarah K.',
-    preview: '我剛整理好繁體中文筆記，可以一起看。',
+    preview: '可以，我們一起改成更自然的說法。',
     time: '4:23 PM',
     unread: 1
   },
@@ -33,7 +33,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'kenji',
     type: 'friend',
     name: 'Kenji',
-    preview: '週末一起做情境對話嗎？',
+    preview: '這週末要不要一起做旅遊情境對話？',
     time: '4:09 PM',
     unread: 0
   },
@@ -41,7 +41,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'luna',
     type: 'friend',
     name: 'Luna',
-    preview: '今天可以練習自我介紹的句型。',
+    preview: '我們今天來練習問路句型吧！',
     time: '3:55 PM',
     unread: 0
   },
@@ -49,7 +49,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'mika',
     type: 'friend',
     name: 'Mika',
-    preview: '我想用繁體中文聊旅行話題！',
+    preview: '我想每天用繁體中文聊十分鐘，你覺得如何？',
     time: '3:40 PM',
     unread: 1
   },
@@ -57,7 +57,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'anya',
     type: 'friend',
     name: 'Anya',
-    preview: '你有空幫我看一下句子嗎？',
+    preview: '這句話的語氣夠禮貌嗎？我怕太直接。',
     time: '3:26 PM',
     unread: 0
   },
@@ -65,7 +65,7 @@ const DEFAULT_CHAT_THREADS = [
     id: 'rika',
     type: 'friend',
     name: 'Rika',
-    preview: '等下通勤時一起語音練習吧。',
+    preview: '通勤中，我們來做一句一句跟讀練習。',
     time: '3:02 PM',
     unread: 0
   },
@@ -73,11 +73,18 @@ const DEFAULT_CHAT_THREADS = [
     id: 'soojin',
     type: 'friend',
     name: 'Soojin',
-    preview: '今天目標：只用繁體中文聊天！',
+    preview: '今天目標：聊天全程只用繁體中文！',
     time: '2:44 PM',
     unread: 0
   }
 ];
+
+const DEFAULT_USER_PROFILE = {
+  displayName: 'Liam A.',
+  fullName: 'Liam Anderson',
+  avatarSeed: 'chen-wei',
+  userId: 'QIAOO-948271'
+};
 
 export const AppProvider = ({ children }) => {
   // ============= STATES =============
@@ -88,6 +95,7 @@ export const AppProvider = ({ children }) => {
   const [translationTargetLang, setTranslationTargetLang] = useState('en'); // Ke bahasa apa
   const [savedWords, setSavedWords] = useState([]);
   const [chatThreads, setChatThreads] = useState(DEFAULT_CHAT_THREADS);
+  const [userProfile, setUserProfile] = useState(DEFAULT_USER_PROFILE);
   const [isFirstTime, setIsFirstTime] = useState(true); // Untuk check first setup
   const [hasSeenSettings, setHasSeenSettings] = useState(false);
 
@@ -97,6 +105,7 @@ export const AppProvider = ({ children }) => {
     const savedSettings = localStorage.getItem('appSettings');
     const savedWordEntries = localStorage.getItem('savedWords');
     const savedChatThreads = localStorage.getItem('chatThreads');
+  const savedUserProfile = localStorage.getItem('userProfile');
 
     if (savedSettings) {
       try {
@@ -144,6 +153,17 @@ export const AppProvider = ({ children }) => {
         console.log('Failed to load chat threads');
       }
     }
+
+    if (savedUserProfile) {
+      try {
+        const parsedProfile = JSON.parse(savedUserProfile);
+        if (parsedProfile && typeof parsedProfile === 'object') {
+          setUserProfile({ ...DEFAULT_USER_PROFILE, ...parsedProfile });
+        }
+      } catch {
+        console.log('Failed to load user profile');
+      }
+    }
   }, []);
 
   // Save ke localStorage setiap kali settings berubah
@@ -167,6 +187,10 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('chatThreads', JSON.stringify(chatThreads));
   }, [chatThreads]);
+
+  useEffect(() => {
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+  }, [userProfile]);
 
   // ============= FUNGSI UPDATE =============
   const updateSettings = (newSettings) => {
@@ -248,6 +272,13 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  const updateUserProfile = (profileUpdate) => {
+    setUserProfile((prev) => ({
+      ...prev,
+      ...profileUpdate
+    }));
+  };
+
   // ============= GETTERS =============
   const getActiveLearningLang = () => LANGUAGES[learningLanguage] || LANGUAGES.zh_tw;
   const getNativeLanguage = () => LANGUAGES[nativeLanguage] || LANGUAGES.en;
@@ -269,6 +300,7 @@ export const AppProvider = ({ children }) => {
     translationTargetLang,
     savedWords,
     chatThreads,
+  userProfile,
     isFirstTime,
     hasSeenSettings,
 
@@ -279,6 +311,7 @@ export const AppProvider = ({ children }) => {
     setTranslationSourceLang,
     setTranslationTargetLang,
     setSavedWords,
+  setUserProfile,
 
     // Functions
     updateSettings,
@@ -289,6 +322,7 @@ export const AppProvider = ({ children }) => {
     openChatThread,
     getChatThreadById,
     updateChatThreadPreview,
+  updateUserProfile,
 
     // Getters
     getActiveLearningLang,

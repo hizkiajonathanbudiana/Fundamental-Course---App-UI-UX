@@ -6,7 +6,7 @@ import { useAppContext } from '../context/AppContext';
 import { buildRadarLearners } from '../constants/radarData';
 
 export default function DynamicHome({ onNavigate, lang }) {
-  const { uiStrings, nativeLang, chatThreads, openChatThread } = useAppContext();
+  const { uiStrings, nativeLang, chatThreads, openChatThread, userProfile } = useAppContext();
 
   const nearbyLearners = useMemo(() => buildRadarLearners(lang.id), [lang.id]);
 
@@ -35,10 +35,10 @@ export default function DynamicHome({ onNavigate, lang }) {
       <header className="mb-6 mt-4 flex justify-between items-center gap-4">
         <button onClick={() => onNavigate('profile')} className="flex items-center gap-3 active:scale-95 transition-transform text-left">
           <div className="w-12 h-12 flex-none rounded-xl border-4 border-black p-0.5 overflow-hidden shadow-[4px_4px_0_#000]" style={{ backgroundColor: lang.secondaryColor }}>
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Liam" alt="Avatar" className="w-full h-full object-cover bg-white" />
+            <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(userProfile?.avatarSeed || 'chen-wei')}`} alt={userProfile?.displayName || 'Avatar'} className="w-full h-full object-cover bg-white" />
           </div>
-          <div className="hidden sm:block min-w-0">
-            <h1 className="text-xl font-black text-white truncate">Liam A.</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl font-black text-white truncate">{userProfile?.displayName || 'Liam A.'}</h1>
             <p className="font-black text-[10px] uppercase tracking-widest" style={{ color: lang.primaryColor }}>{lang.name}</p>
           </div>
         </button>

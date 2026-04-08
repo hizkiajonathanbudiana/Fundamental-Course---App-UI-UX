@@ -432,7 +432,7 @@ const getSimilarityScore = (source, target) => {
 };
 
 export default function Chatbot({ onNavigate, lang }) {
-  const { toggleSavedWord, isWordSaved } = useAppContext();
+  const { toggleSavedWord, isWordSaved, updateChatThreadPreview } = useAppContext();
 
   const [messages, setMessages] = useState([
     {
@@ -510,6 +510,8 @@ export default function Chatbot({ onNavigate, lang }) {
   }, [messages]);
 
   const pushBotMessage = (content, helper = '') => {
+    const preview = parseRichSentence(content).sentence || content;
+    updateChatThreadPreview?.('ai-momo', preview);
     setMessages((prev) => [...prev, { type: 'bot', content, helper }]);
   };
 
@@ -518,6 +520,7 @@ export default function Chatbot({ onNavigate, lang }) {
     if (!userText) return;
 
     setMessages((prev) => [...prev, { type: 'user', content: userText }]);
+  updateChatThreadPreview?.('ai-momo', userText);
 
     if (step === 'ask_level') {
       const inferred = inferLevel(userText);

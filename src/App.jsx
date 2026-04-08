@@ -147,9 +147,23 @@ export default function App() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [selectedFriendCandidate, setSelectedFriendCandidate] = useState(null);
   const [selectedThreadId, setSelectedThreadId] = useState('ai-momo');
+  const [loadingRoute, setLoadingRoute] = useState({ nextView: 'result', backView: 'camera' });
 
   // --- FUNGSI NAVIGASI ---
   const navigateTo = (view, data = null) => {
+    if (view === 'home' && currentView === 'settings') {
+      setLoadingRoute({ nextView: 'home', backView: 'settings' });
+      setCurrentView('loading');
+      return;
+    }
+
+    if (view === 'loading') {
+      setLoadingRoute({
+        nextView: data?.nextView || 'result',
+        backView: data?.backView || 'camera'
+      });
+    }
+
     if (data?.topic) setSelectedTopic(data.topic);
     if (data?.game) setSelectedGame(data.game);
     if (data?.threadId) setSelectedThreadId(data.threadId);
@@ -172,7 +186,7 @@ export default function App() {
 
       // Flow Kamera & Kamus
       case 'camera': return <Camera onNavigate={navigateTo} lang={activeLang} />;
-      case 'loading': return <Loading onNavigate={navigateTo} lang={activeLang} />;
+  case 'loading': return <Loading onNavigate={navigateTo} lang={activeLang} nextView={loadingRoute.nextView} backView={loadingRoute.backView} />;
       case 'result': return <Result onNavigate={navigateTo} lang={activeLang} />;
       case 'search': return <Search onNavigate={navigateTo} lang={activeLang} />;
       case 'hub': return <TranslationHub onNavigate={navigateTo} lang={activeLang} />;
