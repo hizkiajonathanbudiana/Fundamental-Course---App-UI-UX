@@ -1,27 +1,20 @@
 import React, { useMemo } from 'react';
-import { Search, Flame, BellRing, ScanLine, Settings as SettingsIcon } from 'lucide-react';
+import { BellRing, MessageCircle, Settings as SettingsIcon, Bookmark, Languages, ArrowRight } from 'lucide-react';
 import MascotRenderer from '../components/MascotRenderer';
 import RadarCard from '../components/RadarCard';
 import { useAppContext } from '../context/AppContext';
+import { buildRadarLearners } from '../constants/radarData';
 
 export default function DynamicHome({ onNavigate, lang }) {
   const { uiStrings, nativeLang, chatThreads, openChatThread } = useAppContext();
-  
-  // Data mockup user di sekitar dengan bahasa yang beda-beda
-  const nearbyLearners = [
-    { id: 1, name: "Maria", learningLangId: "es", nativeLangId: "es", x: "10%", y: "15%", delay: "0s", distanceKm: 0.2 },
-    { id: 2, name: "Kenji", learningLangId: "zh_tw", nativeLangId: "ja", x: "75%", y: "10%", delay: "0.5s", distanceKm: 1.2 },
-    { id: 3, name: "David", learningLangId: "en", nativeLangId: "zh_tw", x: "65%", y: "70%", delay: "1s", distanceKm: 2.5 },
-  ];
+
+  const nearbyLearners = useMemo(() => buildRadarLearners(lang.id), [lang.id]);
 
   const inboxAlerts = useMemo(() => {
-    const prioritized = [...chatThreads].sort((a, b) => {
-      const aHasUnread = a.unread > 0 ? 1 : 0;
-      const bHasUnread = b.unread > 0 ? 1 : 0;
-      return bHasUnread - aHasUnread;
-    });
-
-    return prioritized.slice(0, 2);
+    // Filter to get all unread messages
+    const unreadThreads = chatThreads.filter(t => t.unread > 0);
+    // If there are no unread messages, maybe show the latest one just to have something
+    return unreadThreads.length > 0 ? unreadThreads : chatThreads.slice(0, 1);
   }, [chatThreads]);
 
   const openAlertThread = (thread) => {
@@ -37,12 +30,12 @@ export default function DynamicHome({ onNavigate, lang }) {
 
   return (
     <div className="h-full w-full p-5 overflow-y-auto pb-32 bg-[#1E1E2A]">
-      
-      {/* 1. Header: Avatar + Language Switcher & Streak */}
+
+      {/* 1. Header: Avatar + Language Switcher & Favorites */}
       <header className="mb-6 mt-4 flex justify-between items-center gap-4">
         <button onClick={() => onNavigate('profile')} className="flex items-center gap-3 active:scale-95 transition-transform text-left">
           <div className="w-12 h-12 flex-none rounded-xl border-4 border-black p-0.5 overflow-hidden shadow-[4px_4px_0_#000]" style={{ backgroundColor: lang.secondaryColor }}>
-             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Liam" alt="Avatar" className="w-full h-full object-cover bg-white" />
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Liam" alt="Avatar" className="w-full h-full object-cover bg-white" />
           </div>
           <div className="hidden sm:block min-w-0">
             <h1 className="text-xl font-black text-white truncate">Liam A.</h1>
@@ -54,9 +47,12 @@ export default function DynamicHome({ onNavigate, lang }) {
           <button onClick={() => onNavigate('settings')} className="bg-white hover:bg-[#F3F3F3] border-4 border-black px-3 py-1.5 rounded-xl shadow-[4px_4px_0_#000] flex items-center gap-1 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" title={uiStrings.settings}>
             <SettingsIcon size={20} className="text-black" />
           </button>
-          <button className="bg-[#2A2A3B] border-4 border-black px-3 py-1.5 rounded-xl shadow-[4px_4px_0_#000] flex items-center gap-1 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
-            <Flame size={20} className="text-[#FF5C00]" fill="#FF5C00" />
-            <span className="text-white font-black text-sm">14</span>
+          <button
+            onClick={() => onNavigate('saved')}
+            className="bg-[#2A2A3B] border-4 border-black w-11 h-11 rounded-xl shadow-[4px_4px_0_#000] flex items-center justify-center active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+            title="Favorites"
+          >
+            <Bookmark size={18} className="text-[#FFD100]" fill="#FFD100" />
           </button>
         </div>
       </header>
@@ -67,27 +63,31 @@ export default function DynamicHome({ onNavigate, lang }) {
         nativeLang={nativeLang}
         nearbyLearners={nearbyLearners}
         radarLabel={uiStrings.radar}
-        subtitle={`${nearbyLearners.length} Friends Nearby`}
+        subtitle={`5 Learners Nearby`}
+        initialRangeKm="auto"
+        enableMarkerPopup={false}
+        radarHeightClass="h-56"
         onClick={() => onNavigate('map')}
       />
 
-      {/* 3. SURVIVAL TOOLS: Tombol raksasa SCAN & DICTIONARY */}
-      <div className="flex gap-4 mb-8">
-        <button 
-          onClick={() => onNavigate('camera')} 
-          className="flex-1 border-4 border-black shadow-[6px_6px_0_#000] rounded-[1.5rem] p-4 flex flex-col items-center justify-center gap-2 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
-          style={{ backgroundColor: lang.primaryColor }}
+      {/* 3. SURVIVAL TOOLS: LATEST TRANSLATION CTA */}
+      <div className="grid grid-cols-1 gap-3 mb-8">
+        <button
+          onClick={() => onNavigate('hub')}
+          className="w-full bg-[#00E5FF] border-4 border-black rounded-2xl px-4 py-4 text-black shadow-[6px_6px_0_#000] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none transition-all"
         >
-          <ScanLine size={36} strokeWidth={3} className="text-black" />
-          <span className="font-black text-black uppercase tracking-widest text-sm">{uiStrings.scan}</span>
-        </button>
-
-        <button 
-          onClick={() => onNavigate('search')} 
-          className="flex-1 bg-white border-4 border-black shadow-[6px_6px_0_#000] rounded-[1.5rem] p-4 flex flex-col items-center justify-center gap-2 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
-        >
-          <Search size={36} strokeWidth={3} className="text-black" />
-          <span className="font-black text-black uppercase tracking-widest text-sm">{uiStrings.dict}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center">
+                <Languages size={20} strokeWidth={2.8} />
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black uppercase tracking-widest text-black/70">Multi‑Modal</p>
+                <p className="text-base font-black leading-tight">Translate Hub</p>
+              </div>
+            </div>
+            <ArrowRight size={20} strokeWidth={3} />
+          </div>
         </button>
       </div>
 
@@ -98,7 +98,7 @@ export default function DynamicHome({ onNavigate, lang }) {
             <BellRing size={20} className="text-[#FFD100]" /> {uiStrings.alerts}
           </h2>
         </div>
-        
+
         <div className="space-y-4">
           {inboxAlerts.map((thread) => (
             <div

@@ -9,32 +9,72 @@ const DEFAULT_CHAT_THREADS = [
     id: 'ai-momo',
     type: 'ai',
     name: 'Momo (AI)',
-    preview: 'Ready for your daily speaking practice?',
+    preview: '準備好今天的口說練習了嗎？',
     time: '4:51 PM',
     unread: 1
-  },
-  {
-    id: 'david-wong',
-    type: 'friend',
-    name: 'David Wong',
-    preview: 'Want to do a short roleplay tonight?',
-    time: '4:48 PM',
-    unread: 2
   },
   {
     id: 'chen-wei',
     type: 'friend',
     name: 'Chen Wei',
-    preview: 'I can help you with tone pronunciation.',
+    preview: '今晚要不要一起練習聲調？',
+    time: '4:48 PM',
+    unread: 2
+  },
+  {
+    id: 'sarah-k',
+    type: 'friend',
+    name: 'Sarah K.',
+    preview: '我剛整理好繁體中文筆記，可以一起看。',
     time: '4:23 PM',
+    unread: 1
+  },
+  {
+    id: 'kenji',
+    type: 'friend',
+    name: 'Kenji',
+    preview: '週末一起做情境對話嗎？',
+    time: '4:09 PM',
     unread: 0
   },
   {
-    id: 'nicho',
+    id: 'luna',
     type: 'friend',
-    name: 'Nicho',
-    preview: 'We can review unit 3 after class.',
-    time: '4:09 PM',
+    name: 'Luna',
+    preview: '今天可以練習自我介紹的句型。',
+    time: '3:55 PM',
+    unread: 0
+  },
+  {
+    id: 'mika',
+    type: 'friend',
+    name: 'Mika',
+    preview: '我想用繁體中文聊旅行話題！',
+    time: '3:40 PM',
+    unread: 1
+  },
+  {
+    id: 'anya',
+    type: 'friend',
+    name: 'Anya',
+    preview: '你有空幫我看一下句子嗎？',
+    time: '3:26 PM',
+    unread: 0
+  },
+  {
+    id: 'rika',
+    type: 'friend',
+    name: 'Rika',
+    preview: '等下通勤時一起語音練習吧。',
+    time: '3:02 PM',
+    unread: 0
+  },
+  {
+    id: 'soojin',
+    type: 'friend',
+    name: 'Soojin',
+    preview: '今天目標：只用繁體中文聊天！',
+    time: '2:44 PM',
     unread: 0
   }
 ];
@@ -88,7 +128,17 @@ export const AppProvider = ({ children }) => {
       try {
         const parsedThreads = JSON.parse(savedChatThreads);
         if (Array.isArray(parsedThreads)) {
-          setChatThreads(parsedThreads);
+          const mergedThreads = [
+            ...DEFAULT_CHAT_THREADS.map((defaultThread) => {
+              const savedThread = parsedThreads.find((thread) => thread.id === defaultThread.id);
+              return savedThread ? { ...defaultThread, ...savedThread } : defaultThread;
+            }),
+            ...parsedThreads.filter(
+              (savedThread) => !DEFAULT_CHAT_THREADS.some((defaultThread) => defaultThread.id === savedThread.id)
+            )
+          ];
+
+          setChatThreads(mergedThreads);
         }
       } catch (e) {
         console.log('Failed to load chat threads');
@@ -176,9 +226,9 @@ export const AppProvider = ({ children }) => {
       prev.map((thread) =>
         thread.id === threadId
           ? {
-              ...thread,
-              unread: 0
-            }
+            ...thread,
+            unread: 0
+          }
           : thread
       )
     );
@@ -189,10 +239,10 @@ export const AppProvider = ({ children }) => {
       prev.map((thread) =>
         thread.id === threadId
           ? {
-              ...thread,
-              preview: nextPreview,
-              time: 'Now'
-            }
+            ...thread,
+            preview: nextPreview,
+            time: 'Now'
+          }
           : thread
       )
     );

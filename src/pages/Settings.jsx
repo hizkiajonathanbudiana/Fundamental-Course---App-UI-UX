@@ -33,15 +33,14 @@ function LanguageCard({ language, selected, onClick, selectedColor }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full p-4 rounded-2xl border-3 transition-all text-left flex items-center justify-between ${
-        selected ? 'bg-opacity-10' : 'border-[#2A2A3E] hover:border-[#3A3A4E]'
-      }`}
+      className={`w-full p-4 rounded-2xl border-3 transition-all text-left flex items-center justify-between ${selected ? 'bg-opacity-10' : 'border-[#2A2A3E] hover:border-[#3A3A4E]'
+        }`}
       style={
         selected
           ? {
-              borderColor: selectedColor,
-              backgroundColor: `${selectedColor}20`
-            }
+            borderColor: selectedColor,
+            backgroundColor: `${selectedColor}20`
+          }
           : undefined
       }
     >
@@ -105,7 +104,7 @@ export default function Settings({ onNavigate }) {
   };
 
   const renderFooter = ({ canGoBack = true, nextLabel = 'Next', onNext = handleNext }) => (
-    <div className="px-6 py-4 border-t-4 border-black bg-[#1E1E2A] flex gap-3">
+    <div className="px-6 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] border-t-4 border-black bg-[#1E1E2A] flex gap-3">
       {canGoBack ? (
         <button
           onClick={handlePrev}
@@ -127,13 +126,13 @@ export default function Settings({ onNavigate }) {
   );
 
   const renderStep1 = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <div className="px-6 pt-8 pb-4">
         <h1 className="text-3xl font-black mb-2">{uiStrings.settings}</h1>
         <p className="text-[#7A7A9A] text-sm">Choose your app interface language</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 space-y-3">
         {languages.map((language) => (
           <LanguageCard
             key={language.id}
@@ -150,13 +149,13 @@ export default function Settings({ onNavigate }) {
   );
 
   const renderStep2 = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <div className="px-6 pt-8 pb-4">
         <h1 className="text-3xl font-black mb-2">Learning Language</h1>
         <p className="text-[#7A7A9A] text-sm">Choose language for your mascot and practice content</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 space-y-3">
         {languages.map((language) => (
           <LanguageCard
             key={language.id}
@@ -173,13 +172,13 @@ export default function Settings({ onNavigate }) {
   );
 
   const renderStep3 = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <div className="px-6 pt-8 pb-4">
         <h1 className="text-3xl font-black mb-2">Native Language</h1>
         <p className="text-[#7A7A9A] text-sm">This will be used for your profile flag and origin country</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 space-y-3">
         {languages.map((language) => (
           <LanguageCard
             key={language.id}
@@ -196,13 +195,13 @@ export default function Settings({ onNavigate }) {
   );
 
   const renderStep4 = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <div className="px-6 pt-8 pb-4">
         <h1 className="text-3xl font-black mb-2">Translation Mode</h1>
         <p className="text-[#7A7A9A] text-sm">Translate from → to what language?</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4">
         <div className="space-y-6">
           <div>
             <p className="font-bold text-sm mb-3 text-[#00FF87]">FROM</p>
@@ -211,9 +210,8 @@ export default function Settings({ onNavigate }) {
                 <button
                   key={`source-${language.id}`}
                   onClick={() => setTempSourceLang(language.id)}
-                  className={`w-full p-3 rounded-xl border-2 transition-all text-left text-sm ${
-                    tempSourceLang === language.id ? 'border-[#00FF87] bg-[#00FF87]/10' : 'border-[#2A2A3E] hover:border-[#3A3A4E]'
-                  }`}
+                  className={`w-full p-3 rounded-xl border-2 transition-all text-left text-sm ${tempSourceLang === language.id ? 'border-[#00FF87] bg-[#00FF87]/10' : 'border-[#2A2A3E] hover:border-[#3A3A4E]'
+                    }`}
                 >
                   <span className="text-xl">{language.flag}</span> {language.name}
                 </button>
@@ -241,9 +239,8 @@ export default function Settings({ onNavigate }) {
                 <button
                   key={`target-${language.id}`}
                   onClick={() => setTempTargetLang(language.id)}
-                  className={`w-full p-3 rounded-xl border-2 transition-all text-left text-sm ${
-                    tempTargetLang === language.id ? 'border-[#FFD100] bg-[#FFD100]/10' : 'border-[#2A2A3E] hover:border-[#3A3A4E]'
-                  }`}
+                  className={`w-full p-3 rounded-xl border-2 transition-all text-left text-sm ${tempTargetLang === language.id ? 'border-[#FFD100] bg-[#FFD100]/10' : 'border-[#2A2A3E] hover:border-[#3A3A4E]'
+                    }`}
                 >
                   <span className="text-xl">{language.flag}</span> {language.name}
                 </button>
@@ -258,13 +255,13 @@ export default function Settings({ onNavigate }) {
   );
 
   const renderStep5 = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <div className="px-6 pt-8 pb-4">
         <h1 className="text-3xl font-black mb-2">Ready!</h1>
         <p className="text-[#7A7A9A] text-sm">Review your settings</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4">
         <div className="space-y-4">
           <div className="p-4 rounded-2xl border-3 border-[#2A2A3E] bg-[#272734]">
             <p className="text-xs font-bold text-[#7A7A9A] mb-2">APP INTERFACE LANGUAGE</p>
@@ -301,7 +298,7 @@ export default function Settings({ onNavigate }) {
         </div>
       </div>
 
-      <div className="px-6 py-4 border-t-4 border-black bg-[#1E1E2A] flex gap-3">
+      <div className="px-6 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] border-t-4 border-black bg-[#1E1E2A] flex gap-3">
         <button
           onClick={handlePrev}
           className="flex-1 px-4 py-3 bg-[#3A3A4E] text-white font-bold rounded-2xl border-3 border-black transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
