@@ -125,7 +125,7 @@ import Loading from './pages/Loading';
 import Result from './pages/Result';
 import Topics from './pages/Topics';
 import Subtopics from './pages/Subtopics';
-import GamePlay from './pages/Gameplay';
+import GamePlay from './pages/GamePlay';
 import Search from './pages/Search';
 import TranslationHub from './pages/TranslationHub';
 import Chatbot from './pages/Chatbot';
